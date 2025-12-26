@@ -1,48 +1,36 @@
-const { Queue } = require('bullmq'); // <--- This was missing!
-const redisConnection = require('../config/redis');
+const { Worker } = require('bullmq');
+const redisConnection = require('./config/redis');
+const { processImportJob } = require('./processors/importProcessor');
 
-// Create the Queue
-const importQueue = new Queue('image-imports', {
+// 👇 THIS NAME MUST MATCH YOUR API ('image-imports')
+const worker = new Worker('image-imports', async (job) => {
+  console.log(`⚡ WORKER: Picked up job ${job.id} (Name: ${job.name})`);
+
+  if (job.name === 'import-images') {
+    // Call your logic to download/upload images
+    await processImportJob(job);
+  } 
+  else if (job.name === 'delete-image') {
+    console.log(`🗑️ Processing delete request for: ${job.data.fileId}`);
+    // Add delete logic here if you have it
+  }
+
+}, {
   connection: redisConnection,
-  defaultJobOptions: {
-    attempts: 3,
-    backoff: {
-      type: 'exponential',
-      delay: 5000,
-    },
-    // Keep the job in Redis after completion so the API can read the status
-    removeOnComplete: false, 
-    removeOnFail: false
-  },
+  concurrency: 5 // Optional: Process 5 imports at once
 });
 
-exports.enqueueImportJob = async (jobData) => {
-  // Add job to the queue
-  const job = await importQueue.add('import-images', jobData, {
-    jobId: `job-${Date.now()}`, // Simple unique ID
-  });
-  return job;
-};
+// Logs to help us debug on Render
+worker.on('active', (job) => {
+  console.log(`🏃 Job ${job.id} is now ACTIVE!`);
+});
 
-exports.getJobStatus = async (jobId) => {
-  const job = await importQueue.getJob(jobId);
-  if (!job) return null;
+worker.on('completed', (job) => {
+  console.log(`✅ Job ${job.id} COMPLETED!`);
+});
 
-  const state = await job.getState();
-  // job.progress is a getter in some versions, or a property in others. 
-  // We use the safe access pattern here.
-  const progress = job.progress || 0; 
+worker.on('failed', (job, err) => {
+  console.error(`❌ Job ${job.id} FAILED: ${err.message}`);
+});
 
-  return {
-    id: job.id,
-    state,
-    progress,
-    data: job.data,
-    failedReason: job.failedReason,
-  };
-};
-
-exports.enqueueDeleteJob = async (data) => {
-  // reusing the same queue, but with a different name
-  return await importQueue.add('delete-image', data);
-}
+console.log('👷 Worker Service is running and listening to "image-imports"...');
