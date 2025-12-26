@@ -1,11 +1,11 @@
+// worker-service/src/config/redis.js
 const Redis = require('ioredis');
-require('dotenv').config();
 
-// Max retries null means it will keep trying to connect forever (good for workers)
-const connection = new Redis({
-  host: 'localhost',
-  port: process.env.REDIS_PORT || 6379,
-  maxRetriesPerRequest: null, 
+const connection = new Redis(process.env.REDIS_URL || {
+  host: '127.0.0.1',
+  port: 6379,
+}, {
+  maxRetriesPerRequest: null // Required by BullMQ
 });
 
 module.exports = connection;
