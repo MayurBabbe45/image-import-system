@@ -1,5 +1,5 @@
 const { Worker } = require('bullmq');
-const redisConnection = require('./config/redis');
+const redisConnection = require('../config/redis');
 const { processImportJob } = require('./processors/importProcessor');
 
 // 👇 THIS NAME MUST MATCH YOUR API ('image-imports')
