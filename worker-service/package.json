@@ -1,0 +1,28 @@
+{
+  "name": "worker-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.957.0",
+    "axios": "^1.13.2",
+    "bullmq": "^5.66.2",
+    "cloudinary": "^2.8.0",
+    "dotenv": "^17.2.3",
+    "ioredis": "^5.8.2",
+    "pg": "^8.16.3",
+    "pino": "^10.1.0",
+    "sharp": "^0.34.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
+}
