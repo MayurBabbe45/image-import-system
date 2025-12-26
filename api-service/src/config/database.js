@@ -1,15 +1,14 @@
 const { Pool } = require('pg');
-require('dotenv').config(); // Load vars from .env (make sure .env is in root or handled)
+require('dotenv').config();
 
-// Note: When running locally (outside Docker), we use localhost.
-// When running inside Docker, we would use 'postgres'.
-// For this phase, we assume you are running 'npm run dev' on your local machine.
+const isProduction = process.env.NODE_ENV === 'production' || process.env.DATABASE_URL;
+
 const pool = new Pool({
-  user: process.env.DB_USER || 'imageuser',
-  host: 'localhost', // External access to Docker container
-  database: process.env.DB_NAME || 'image_imports',
-  password: process.env.DB_PASSWORD || 'imagepass',
-  port: process.env.DB_PORT || 5432,
+  // 1. If DATABASE_URL exists (Render), use it. Otherwise use local config.
+  connectionString: process.env.DATABASE_URL || `postgresql://${process.env.DB_USER || 'imageuser'}:${process.env.DB_PASSWORD || 'imagepass'}@localhost:5432/${process.env.DB_NAME || 'image_imports'}`,
+  
+  // 2. SSL is REQUIRED for Render, but breaks localhost. This handles both.
+  ssl: isProduction ? { rejectUnauthorized: false } : false
 });
 
 module.exports = {
