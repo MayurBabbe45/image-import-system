@@ -1,14 +1,27 @@
 const { Pool } = require('pg');
-require('dotenv').config();
+
+// Check if we are in production (Render) or local
+const isProduction = process.env.NODE_ENV === 'production';
+
+const connectionString = process.env.DATABASE_URL;
+
+if (!connectionString) {
+  console.error('❌ FATAL: DATABASE_URL is missing! Worker cannot connect to DB.');
+}
 
 const pool = new Pool({
-  user: process.env.DB_USER || 'imageuser',
-  host: 'localhost',
-  database: process.env.DB_NAME || 'image_imports',
-  password: process.env.DB_PASSWORD || 'imagepass',
-  port: process.env.DB_PORT || 5432,
+  connectionString: connectionString,
+  ssl: isProduction ? { rejectUnauthorized: false } : false // Required for Render Postgres
 });
 
-module.exports = {
-  query: (text, params) => pool.query(text, params),
-};
+// Test the connection immediately on startup
+pool.connect((err, client, release) => {
+  if (err) {
+    console.error('❌ Error acquiring client', err.stack);
+  } else {
+    console.log('✅ Database connected successfully');
+    release();
+  }
+});
+
+module.exports = pool;
