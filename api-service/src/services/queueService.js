@@ -1,4 +1,4 @@
-const { Queue } = require('bullmq'); // <--- This was missing!
+const { Queue } = require('bullmq'); 
 const redisConnection = require('../config/redis');
 
 // Create the Queue
@@ -10,27 +10,29 @@ const importQueue = new Queue('image-imports', {
       type: 'exponential',
       delay: 5000,
     },
-    // Keep the job in Redis after completion so the API can read the status
+    
     removeOnComplete: false, 
     removeOnFail: false
   },
 });
 
+// Add job to queue
 exports.enqueueImportJob = async (jobData) => {
-  // Add job to the queue
+  
   const job = await importQueue.add('import-images', jobData, {
-    jobId: `job-${Date.now()}`, // Simple unique ID
+    jobId: `job-${Date.now()}`,
   });
   return job;
 };
 
+
+//this is for getting job status
 exports.getJobStatus = async (jobId) => {
   const job = await importQueue.getJob(jobId);
   if (!job) return null;
 
   const state = await job.getState();
-  // job.progress is a getter in some versions, or a property in others. 
-  // We use the safe access pattern here.
+  // progress is a number between 0 and 100.
   const progress = job.progress || 0; 
 
   return {
@@ -42,7 +44,7 @@ exports.getJobStatus = async (jobId) => {
   };
 };
 
+//this is for deleting images
 exports.enqueueDeleteJob = async (data) => {
-  // reusing the same queue, but with a different name
   return await importQueue.add('delete-image', data);
 }

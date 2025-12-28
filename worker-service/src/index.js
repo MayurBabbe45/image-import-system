@@ -6,7 +6,7 @@ console.log('👷 Worker Service Starting...');
 
 const worker = new Worker('image-imports', importImageWorker, {
     connection: redisConnection,
-    concurrency: 5 // Process 5 jobs at the same time
+    concurrency: 5 
 });
 
 worker.on('completed', (job) => {
@@ -17,7 +17,7 @@ worker.on('failed', (job, err) => {
     console.log(`Job ${job.id} has failed with ${err.message}`);
 });
 
-// 👇 ADD THIS TO SATISFY RENDER
+
 const express = require('express');
 const app = express();
 const port = process.env.PORT || 8080;

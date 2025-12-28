@@ -23,7 +23,7 @@ export function useJobStatus(jobId) {
                 console.error("Polling error", err);
                 clearInterval(poll);
             }
-        }, 2000); // Poll every 2 seconds
+        }, 2000); 
 
         return () => clearInterval(poll);
     }, [jobId]);

@@ -1,11 +1,11 @@
--- api-service/sql/schema.sql
+
 CREATE TABLE IF NOT EXISTS import_jobs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     folder_id VARCHAR(255) NOT NULL,
     import_name VARCHAR(255) NOT NULL,
     max_images INT DEFAULT 10000,
     tags JSONB,
-    status VARCHAR(50) DEFAULT 'QUEUED', -- QUEUED, PROCESSING, COMPLETED, FAILED
+    status VARCHAR(50) DEFAULT 'QUEUED', 
     total_images INT DEFAULT 0,
     imported_count INT DEFAULT 0,
     failed_count INT DEFAULT 0,

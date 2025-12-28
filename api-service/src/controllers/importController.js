@@ -30,8 +30,8 @@ exports.importFromGoogleDrive = async (req, res) => {
 
         // Add to Queue
         const job = await queueService.enqueueImportJob({
-            dbJobId,      // The ID in Postgres
-            folderId,     // The ID in Google Drive
+            dbJobId,      
+            folderId,     
             importName,
             maxImages,
             tags
@@ -51,11 +51,11 @@ exports.importFromGoogleDrive = async (req, res) => {
     }
 };
 
-// 2. JOB STATUS FUNCTION (GET) - This was missing!
+// 2. GET JOB STATUS FUNCTION (GET)
 exports.getJobStatus = async (req, res) => {
     try {
         const { jobId } = req.params;
-        // Ask the Queue Service for the status
+        
         const job = await queueService.getJobStatus(jobId);
         
         if (!job) {
@@ -65,8 +65,8 @@ exports.getJobStatus = async (req, res) => {
         res.json({
             success: true,
             jobId: job.id,
-            state: job.state,       // 'waiting', 'active', 'completed', 'failed'
-            progress: job.progress, // number 0-100
+            state: job.state,      
+            progress: job.progress, 
             failedReason: job.failedReason
         });
     } catch (err) {
@@ -79,7 +79,6 @@ exports.getJobStatus = async (req, res) => {
 exports.getImages = async (req, res) => {
     try {
         const limit = req.query.limit || 20;
-        // Simple query to fetch latest images
         const result = await db.query(
             `SELECT * FROM images ORDER BY uploaded_at DESC LIMIT $1`, 
             [limit]
@@ -95,26 +94,24 @@ exports.getImages = async (req, res) => {
 };
 
 
-
+// 4. DELETE IMAGE FUNCTION (DELETE)
 exports.deleteImage = async (req, res) => {
   try {
     const { id } = req.params;
     
-    // 1. Get image details to find the Cloudinary ID
+    
     const result = await pool.query('SELECT * FROM images WHERE id = $1', [id]);
     if (result.rows.length === 0) {
       return res.status(404).json({ error: 'Image not found' });
     }
     const image = result.rows[0];
 
-    // 2. Add a "Delete Job" to the queue 
-    // (We do this async so the UI is fast)
+    
     await queueService.enqueueDeleteJob({
-      publicId: image.minio_object_key, // This is the Cloudinary ID
+      publicId: image.minio_object_key, 
       dbId: id
     });
 
-    // 3. Remove from DB immediately so UI updates instantly
     await pool.query('DELETE FROM images WHERE id = $1', [id]);
 
     res.json({ success: true, message: 'Deletion started' });

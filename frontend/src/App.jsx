@@ -15,7 +15,7 @@ function App() {
   const [sortBy, setSortBy] = useState('newest');      // 'newest', 'oldest', 'largest', 'smallest'
 
  const fetchImages = async (isBackgroundRefresh = false) => {
-    // 👇 ONLY show loading spinner if it's NOT a background refresh
+   
     if (!isBackgroundRefresh) setIsLoadingGallery(true);
     
     try {
@@ -35,10 +35,10 @@ function App() {
 };
 
   const handleDelete = async (id, e) => {
-    e.stopPropagation(); // Prevent opening the image
+    e.stopPropagation(); 
     if(!confirm('Are you sure you want to delete this image?')) return;
 
-    // Optimistic UI Update: Remove it from screen immediately
+    
     setImages(prev => prev.filter(img => img.id !== id));
 
     try {
@@ -46,7 +46,7 @@ function App() {
     } catch (err) {
         console.error("Delete failed", err);
         alert("Failed to delete image");
-        fetchImages(true); // Revert if failed
+        fetchImages(true); 
     }
 };
 
@@ -54,7 +54,7 @@ function App() {
     fetchImages();
   }, []);
 
-  // --- NEW: Filter Logic (Client Side) ---
+  
   const processedImages = useMemo(() => {
     let result = [...images];
 

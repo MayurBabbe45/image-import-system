@@ -1,6 +1,5 @@
 const { google } = require('googleapis');
 const cloudinary = require('cloudinary').v2;
-// 👇 Note the double dot ".." to go up to src, then down to config
 const pool = require('../config/database'); 
 
 // 1. Configure Cloudinary
@@ -16,9 +15,6 @@ const drive = google.drive({ version: 'v3', auth: process.env.GOOGLE_API_KEY });
 // This function handles BOTH imports and deletes
 module.exports = async (job) => {
   
-  // ==========================
-  // LOGIC A: DELETE IMAGE
-  // ==========================
   if (job.name === 'delete-image') {
     const { publicId } = job.data;
     console.log(`🗑️ Deleting image: ${publicId}`);
@@ -31,9 +27,6 @@ module.exports = async (job) => {
     return;
   }
 
-  // ==========================
-  // LOGIC B: IMPORT IMAGES
-  // ==========================
   // API sends 'jobId', but we handle 'dbJobId' just in case
   const { jobId, folderId } = job.data;
   const currentJobId = jobId || job.data.dbJobId;

@@ -3,15 +3,9 @@ require('dotenv').config();
 
 const API_KEY = process.env.GOOGLE_API_KEY;
 
+// List images in a folder
 exports.listImagesInFolder = async (folderId, maxImages) => {
-    // MOCK MODE: If no API Key is set, return fake data so we can test the worker
-    if (!API_KEY || API_KEY === 'PLACEHOLDER_FOR_NOW') {
-        console.log("⚠️ No Google API Key found. Using MOCK data.");
-        return [
-            { id: 'mock-1', name: 'test-image-1.jpg', mimeType: 'image/jpeg' },
-            { id: 'mock-2', name: 'test-image-2.png', mimeType: 'image/png' }
-        ];
-    }
+   
 
     // REAL MODE
     const url = `https://www.googleapis.com/drive/v3/files`;
@@ -26,6 +20,7 @@ exports.listImagesInFolder = async (folderId, maxImages) => {
     return response.data.files;
 };
 
+// Download an image
 exports.downloadImage = async (fileId) => {
     if (!API_KEY || API_KEY === 'PLACEHOLDER_FOR_NOW') {
          // Return a minimal valid 1x1 pixel JPEG buffer for testing

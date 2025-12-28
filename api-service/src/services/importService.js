@@ -1,13 +1,9 @@
-// api-service/src/services/importService.js
+
 const queueService = require('./queueService');
 const db = require('../config/database');
 
-/**
- * Initiates an import workflow:
- * 1. Create ImportJob record in DB
- * 2. Enqueue BullMQ job
- * 3. Return job metadata
- */
+
+// Initiate import job and return job ID and bull job ID
 exports.initiateImport = async (jobPayload) => {
   const { folderId, importName, maxImages, tags } = jobPayload;
 
@@ -37,9 +33,7 @@ exports.initiateImport = async (jobPayload) => {
   };
 };
 
-/**
- * Query images by import job ID
- */
+// Get images for job
 exports.getImagesForJob = async (jobId, limit, offset) => {
   const result = await db.query(
     `

@@ -23,16 +23,16 @@ exports.uploadImage = async (fileBuffer, fileName, mimeType) => {
           return reject(error);
         }
         
-        // FIX: Return the ID under multiple names to satisfy the Worker's expectation
+        
         resolve({
-          url: result.secure_url,       // Public URL
+          url: result.secure_url,    
           etag: result.etag,
           
-          // The "Shotgun Approach": One of these is what the worker is looking for
-          path: result.public_id,       // Standard
-          key: result.public_id,        // AWS Style
-          objectName: result.public_id, // MinIO Style
-          name: result.public_id        // Generic
+         
+          path: result.public_id,    
+          key: result.public_id,        
+          objectName: result.public_id, 
+          name: result.public_id       
         });
       }
     );
